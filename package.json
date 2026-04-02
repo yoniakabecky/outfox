@@ -1,0 +1,18 @@
+{
+  "name": "outfox",
+  "version": "0.1.0",
+  "description": "🦝 vs 🦊",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "biome check . --fix"
+  },
+  "keywords": [],
+  "author": "yoniakabecky <yoniakabecky@gmail.com>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.32.1",
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.10",
+    "typescript": "^6.0.2"
+  }
+}

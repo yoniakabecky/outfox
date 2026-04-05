@@ -1,4 +1,5 @@
-import type { Board } from "./types";
+import { dealCards } from "./cards";
+import { Board, GameState } from "./types";
 
 const initialBoard: Board = [
   [
@@ -19,3 +20,18 @@ const initialBoard: Board = [
     { player: "tanuki", type: "sibling" },
   ],
 ];
+
+export const initState = (): GameState => {
+  const cards = dealCards();
+
+  return {
+    board: [...initialBoard],
+    foxCards: [cards[0], cards[2]],
+    tanukiCards: [cards[1], cards[3]],
+    waitingCard: cards[4],
+    currentTurn: cards[4].stamp,
+    phase: "select-card",
+    selectedCard: null,
+    winner: null,
+  };
+};

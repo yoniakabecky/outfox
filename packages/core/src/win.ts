@@ -1,0 +1,38 @@
+import { GameState } from "./types";
+
+export const checkWin = (state: GameState): "fox" | "tanuki" | null => {
+  const foxNest = state.board[0][2];
+  const tanukiNest = state.board[4][2];
+
+  // Check if fox boss is in tanuki nest
+  if (tanukiNest && tanukiNest.player === "fox" && tanukiNest.type === "boss") {
+    return "fox";
+  }
+
+  // Check if tanuki boss is in fox nest
+  if (foxNest && foxNest.player === "tanuki" && foxNest.type === "boss") {
+    return "tanuki";
+  }
+
+  // Check if either boss is captured
+  let foxBossCaptured = true;
+  let tanukiBossCaptured = true;
+
+  for (const row of state.board) {
+    for (const cell of row) {
+      if (cell) {
+        if (cell.player === "fox" && cell.type === "boss") {
+          foxBossCaptured = false;
+        }
+        if (cell.player === "tanuki" && cell.type === "boss") {
+          tanukiBossCaptured = false;
+        }
+      }
+    }
+  }
+
+  if (foxBossCaptured) return "tanuki";
+  if (tanukiBossCaptured) return "fox";
+
+  return null;
+};

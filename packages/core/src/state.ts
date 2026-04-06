@@ -1,5 +1,5 @@
 import { dealCards } from "./cards";
-import { Board, GameState } from "./types";
+import type { Board, Card, GameState, Hand } from "./types";
 
 const initialBoard: Board = [
   [
@@ -20,6 +20,23 @@ const initialBoard: Board = [
     { player: "tanuki", type: "sibling" },
   ],
 ];
+
+export const cycleCard = (state: GameState, usedCard: Card): GameState => {
+  const isFox = state.currentTurn === "fox";
+  const hand = isFox ? state.foxCards : state.tanukiCards;
+
+  const newHand = hand.map((c) =>
+    c === usedCard ? state.waitingCard : c,
+  ) as Hand;
+
+  return {
+    ...state,
+    foxCards: isFox ? newHand : state.foxCards,
+    tanukiCards: isFox ? state.tanukiCards : newHand,
+    waitingCard: usedCard,
+    currentTurn: isFox ? "tanuki" : "fox",
+  };
+};
 
 export const initState = (): GameState => {
   const cards = dealCards();

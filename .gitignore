@@ -16,3 +16,9 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+
+# IDE
+.vscode/
+
+# Memo
+*/memo/

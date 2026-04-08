@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import type { GameState } from "./types";
 import { checkWin } from "./win";
 
 describe("checkWin", () => {
@@ -11,8 +12,8 @@ describe("checkWin", () => {
         [null, null, null, null, null],
         [null, null, null, { player: "tanuki", type: "boss" }, null],
       ],
-    };
-    expect(checkWin(state as any)).toBeNull();
+    } as GameState;
+    expect(checkWin(state)).toBeNull();
   });
 
   test("should return 'fox' if fox boss is in tanuki nest", () => {
@@ -24,8 +25,8 @@ describe("checkWin", () => {
         [null, null, null, null, null],
         [null, null, { player: "fox", type: "boss" }, null, null],
       ],
-    };
-    expect(checkWin(state as any)).toBe("fox");
+    } as GameState;
+    expect(checkWin(state)).toBe("fox");
   });
 
   test("should return 'tanuki' if tanuki boss is in fox nest", () => {
@@ -37,8 +38,8 @@ describe("checkWin", () => {
         [null, { player: "fox", type: "boss" }, null, null, null],
         [null, null, null, null, null],
       ],
-    };
-    expect(checkWin(state as any)).toBe("tanuki");
+    } as GameState;
+    expect(checkWin(state)).toBe("tanuki");
   });
 
   test("should return 'tanuki' if fox boss is captured", () => {
@@ -50,8 +51,8 @@ describe("checkWin", () => {
         [null, { player: "tanuki", type: "sibling" }, null, null, null],
         [null, null, { player: "tanuki", type: "boss" }, null, null],
       ],
-    };
-    expect(checkWin(state as any)).toBe("tanuki");
+    } as GameState;
+    expect(checkWin(state)).toBe("tanuki");
   });
 
   test("should return 'fox' if tanuki boss is captured", () => {
@@ -63,8 +64,8 @@ describe("checkWin", () => {
         [null, { player: "tanuki", type: "sibling" }, null, null, null],
         [null, null, null, null, null],
       ],
-    };
-    expect(checkWin(state as any)).toBe("fox");
+    } as GameState;
+    expect(checkWin(state)).toBe("fox");
   });
 
   test("should return null if a sibling piece is in opponent nests (tanuki)", () => {
@@ -76,8 +77,8 @@ describe("checkWin", () => {
         [null, { player: "fox", type: "boss" }, null, null, null],
         [null, null, { player: "tanuki", type: "boss" }, null, null],
       ],
-    };
-    expect(checkWin(state as any)).toBeNull();
+    } as GameState;
+    expect(checkWin(state)).toBeNull();
   });
 
   test("should return null if a sibling piece is in opponent nests (fox)", () => {
@@ -89,7 +90,7 @@ describe("checkWin", () => {
         [null, { player: "tanuki", type: "boss" }, null, null, null],
         [null, null, { player: "fox", type: "sibling" }, null, null],
       ],
-    };
-    expect(checkWin(state as any)).toBeNull();
+    } as GameState;
+    expect(checkWin(state)).toBeNull();
   });
 });

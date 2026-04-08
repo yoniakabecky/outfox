@@ -1,6 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { selectCard, cancelSelection, makeMove } from "./actions";
+import { cancelSelection, makeMove, selectCard } from "./actions";
 import { cards } from "./cards";
+import { ErrorCode, GameError } from "./errors";
+import type { GameState } from "./types";
 
 describe("selectCard", () => {
   const initialState = {
@@ -10,11 +12,11 @@ describe("selectCard", () => {
     tanukiCards: [cards.frog, cards.monkey],
     waitingCard: cards.hawk,
     selectedCard: null,
-  };
+  } as GameState;
 
   test("should update state with selected card and change phase to select-piece", () => {
     const cardToSelect = cards.tiger;
-    const newState = selectCard(initialState as any, cardToSelect);
+    const newState = selectCard(initialState, cardToSelect);
 
     expect(newState.phase).toBe("select-piece");
     expect(newState.selectedCard).toBe(cardToSelect);
@@ -22,18 +24,22 @@ describe("selectCard", () => {
 
   test("should throw error if not in select-card phase", () => {
     const state = { ...initialState, phase: "select-piece" as const };
-    expect(() => selectCard(state as any, cards.tiger)).toThrow(
-      "Not in select-card phase",
+    const fn = () => selectCard(state, cards.tiger);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
     );
   });
 
   test("should throw error if card does not belong to current player", () => {
-    expect(() => selectCard(initialState as any, cards.frog)).toThrow(
-      "Card does not belong to current player",
+    const fn = () => selectCard(initialState, cards.frog);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.CARD_NOT_IN_HAND }),
     );
-    expect(() =>
-      selectCard(initialState as any, initialState.waitingCard),
-    ).toThrow("Card does not belong to current player");
+    expect(() => selectCard(initialState, initialState.waitingCard)).toThrow(
+      expect.objectContaining({ code: ErrorCode.CARD_NOT_IN_HAND }),
+    );
   });
 });
 
@@ -42,17 +48,19 @@ describe("cancelSelection", () => {
     const state = {
       phase: "select-piece",
       selectedCard: cards.tiger,
-    };
-    const newState = cancelSelection(state as any);
+    } as GameState;
+    const newState = cancelSelection(state);
 
     expect(newState.phase).toBe("select-card");
     expect(newState.selectedCard).toBeNull();
   });
 
   test("should throw if not in select-piece phase", () => {
-    const state = { phase: "select-card", selectedCard: null };
-    expect(() => cancelSelection(state as any)).toThrow(
-      "Not in select-piece phase",
+    const state = { phase: "select-card", selectedCard: null } as GameState;
+    const fn = () => cancelSelection(state);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
     );
   });
 });
@@ -73,13 +81,13 @@ describe("makeMove", () => {
     phase: "select-piece",
     selectedCard: cards.tiger,
     winner: null,
-  };
+  } as GameState;
 
   test("should apply move, cycle card, and switch phase to select-card if no winner", () => {
     const from = [1, 1] as [number, number];
     const to = [0, 1] as [number, number];
 
-    const newState = makeMove(state as any, from, to);
+    const newState = makeMove(state, from, to);
 
     expect(newState.board[0][1]).toEqual({ player: "fox", type: "sibling" });
     expect(newState.board[1][1]).toBeNull();
@@ -100,9 +108,9 @@ describe("makeMove", () => {
       ],
       currentTurn: "tanuki",
       selectedCard: cards.frog,
-    };
+    } as GameState;
     // tanuki sibling at [2,2] uses frog move [-1,-1] to capture fox boss at [1,1]
-    const newState = makeMove(winningState as any, [2, 2], [1, 1]);
+    const newState = makeMove(winningState, [2, 2], [1, 1]);
 
     expect(newState.board[1][1]).toEqual({ player: "tanuki", type: "sibling" });
     expect(newState.board[2][2]).toBeNull();
@@ -121,9 +129,9 @@ describe("makeMove", () => {
         [null, null, null, { player: "tanuki", type: "boss" }, null],
       ],
       selectedCard: cards.tiger,
-    };
+    } as GameState;
     // tiger from [2,2] can reach [4,2] (tanuki nest) via fox-mirrored move [2,0]
-    const newState = makeMove(winningState as any, [2, 2], [4, 2]);
+    const newState = makeMove(winningState, [2, 2], [4, 2]);
 
     expect(newState.board[4][2]).toEqual({ player: "fox", type: "boss" });
     expect(newState.board[2][2]).toBeNull();
@@ -132,31 +140,42 @@ describe("makeMove", () => {
   });
 
   test("should throw error if phase is not 'select-piece'", () => {
-    const invalidState = { ...state, phase: "select-card" as const };
-    expect(() => makeMove(invalidState as any, [1, 1], [0, 1])).toThrow(
-      "Not in select-piece phase",
+    const invalidState = {
+      ...state,
+      phase: "select-card" as const,
+    } as GameState;
+    const fn = () => makeMove(invalidState, [1, 1], [0, 1]);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
     );
   });
 
   test("should throw error if no card is selected", () => {
-    const invalidState = { ...state, selectedCard: null };
-    expect(() => makeMove(invalidState as any, [1, 1], [0, 1])).toThrow(
-      "No card selected",
+    const invalidState = { ...state, selectedCard: null } as GameState;
+    const fn = () => makeMove(invalidState, [1, 1], [0, 1]);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.NO_CARD_SELECTED }),
     );
   });
 
   test("should throw error if move is invalid according to selected card", () => {
-    const invalidState = { ...state, selectedCard: cards.dragon };
+    const invalidState = { ...state, selectedCard: cards.dragon } as GameState;
     // dragon fox-mirrored moves from [1,1]: [2,3], [0,2], [0,0] — [1,0] is not reachable
-    expect(() => makeMove(invalidState as any, [1, 1], [1, 0])).toThrow(
-      "Invalid move for the selected card",
+    const fn = () => makeMove(invalidState, [1, 1], [1, 0]);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.INVALID_MOVE }),
     );
   });
 
   test("should throw error if selected piece belongs to the opponent", () => {
     // [2,2] is a tanuki piece; fox cannot move it
-    expect(() => makeMove(state as any, [2, 2], [1, 2])).toThrow(
-      "Cannot move opponent's piece",
+    const fn = () => makeMove(state as GameState, [2, 2], [1, 2]);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.OPPONENT_PIECE }),
     );
   });
 });

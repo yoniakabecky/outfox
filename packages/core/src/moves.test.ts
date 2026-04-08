@@ -1,0 +1,146 @@
+import { describe, expect, test } from "vitest";
+import { applyMove, getValidMoves } from "./moves";
+import { cards } from "./cards";
+
+describe("getValidMoves", () => {
+  const board = [
+    [null, null, { player: "fox" }, null, null],
+    [null, { player: "fox" }, null, null, null],
+    [null, null, { player: "tanuki" }, null, null],
+    [null, null, null, null, null],
+    [null, null, null, { player: "tanuki" }, null],
+  ];
+
+  test("should returns valid moves for a piece (fox)", () => {
+    const piecePos = [1, 1] as [number, number];
+    const validMoves = getValidMoves({ board } as any, piecePos, cards.tiger);
+    expect(validMoves).toEqual([
+      [3, 1],
+      [0, 1],
+    ]);
+  });
+
+  test("should returns valid moves for a piece (tanuki)", () => {
+    const piecePos = [4, 3] as [number, number];
+    const validMoves = getValidMoves({ board } as any, piecePos, cards.frog);
+    expect(validMoves).toEqual([
+      [4, 1],
+      [3, 2],
+    ]);
+  });
+
+  test("should returns empty array if no piece at position", () => {
+    const piecePos = [0, 0] as [number, number];
+    const validMoves = getValidMoves({ board } as any, piecePos, cards.tiger);
+    expect(validMoves).toEqual([]);
+  });
+
+  test("should not return moves that team piece occupies (fox)", () => {
+    const piecePos = [1, 1] as [number, number];
+    const validMoves = getValidMoves({ board } as any, piecePos, cards.dragon);
+    expect(validMoves).toEqual([
+      [2, 3],
+      [0, 0],
+      // [0, 2] is occupied by a team piece
+    ]);
+  });
+
+  test("should return moves that opponent team piece occupies (tanuki)", () => {
+    const piecePos = [2, 2] as [number, number];
+    const validMoves = getValidMoves({ board } as any, piecePos, cards.monkey);
+    expect(validMoves).toEqual([
+      [1, 1], // occupied by an opponent piece
+      [1, 3],
+      [3, 1],
+      [3, 3],
+    ]);
+  });
+
+  test("should not return moves that are out of board bounds", () => {
+    const piecePos = [0, 2] as [number, number];
+    const validMoves = getValidMoves({ board } as any, piecePos, cards.tiger);
+    expect(validMoves).toEqual([
+      [2, 2],
+      // [-2, 2] is out of bounds
+    ]);
+  });
+
+  test("should return empty array if all moves are invalid", () => {
+    const state = {
+      board: [
+        [null, null, { player: "fox" }, null, null],
+        [null, { player: "tanuki" }, null, null, null],
+        [null, null, { player: "fox" }, null, null],
+        [null, null, null, null, null],
+        [null, null, null, { player: "tanuki" }, null],
+      ],
+    };
+    const piecePos = [0, 2] as [number, number];
+    const validMoves = getValidMoves(state as any, piecePos, cards.tiger);
+    expect(validMoves).toEqual([]);
+  });
+});
+
+describe("applyMove", () => {
+  const state = {
+    board: [
+      [null, null, { player: "fox" }, null, null],
+      [null, { player: "fox" }, null, null, null],
+      [null, null, { player: "tanuki" }, null, null],
+      [null, null, null, null, null],
+      [null, null, null, { player: "tanuki" }, null],
+    ],
+  };
+
+  test("should move piece to new position (tanuki)", () => {
+    const from = [4, 3] as [number, number];
+    const to = [3, 3] as [number, number];
+    const newState = applyMove(state as any, from, to);
+    expect(newState.board[3][3]).toEqual({ player: "tanuki" });
+    expect(newState.board[4][3]).toBeNull();
+  });
+
+  test("should move piece to new position (fox)", () => {
+    const from = [0, 2] as [number, number];
+    const to = [0, 0] as [number, number];
+    const newState = applyMove(state as any, from, to);
+    expect(newState.board[0][0]).toEqual({ player: "fox" });
+    expect(newState.board[0][2]).toBeNull();
+  });
+
+  test("should throw error if no piece at source position", () => {
+    const from = [0, 0] as [number, number];
+    const to = [0, 1] as [number, number];
+    expect(() => applyMove(state as any, from, to)).toThrow(
+      "No piece at the source position",
+    );
+  });
+
+  test("should throw error if moving to a cell occupied by team piece", () => {
+    const from = [0, 2] as [number, number];
+    const to = [1, 1] as [number, number];
+    expect(() => applyMove(state as any, from, to)).toThrow(
+      "Cannot move to a cell occupied by a team piece",
+    );
+  });
+
+  test("should allow moving to a cell occupied by opponent piece", () => {
+    const from = [0, 2] as [number, number]; // fox piece
+    const to = [2, 2] as [number, number]; // tanuki piece
+    const newState = applyMove(state as any, from, to);
+    expect(newState.board[2][2]).toEqual({ player: "fox" });
+    expect(newState.board[0][2]).toBeNull();
+  });
+
+  test("should not mutate original board state", () => {
+    const from = [0, 2] as [number, number];
+    const to = [0, 0] as [number, number];
+    const newState = applyMove(state as any, from, to);
+    // newState should reflect the move
+    expect(newState.board[0][2]).toBeNull();
+    expect(newState.board[0][0]).toEqual({ player: "fox" });
+    // original state should remain unchanged
+    expect(state.board[0][2]).toEqual({ player: "fox" });
+    expect(state.board[0][0]).toBeNull();
+  });
+});

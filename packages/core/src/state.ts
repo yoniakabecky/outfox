@@ -24,6 +24,9 @@ const initialBoard: Board = [
 export const cycleCard = (state: GameState, usedCard: Card): GameState => {
   const isFox = state.currentTurn === "fox";
   const hand = isFox ? state.foxCards : state.tanukiCards;
+  if (!hand.includes(usedCard)) {
+    return state;
+  }
 
   const newHand = hand.map((c) =>
     c === usedCard ? state.waitingCard : c,

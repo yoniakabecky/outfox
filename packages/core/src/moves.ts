@@ -1,4 +1,5 @@
-import { Card, GameState } from "./types";
+import { ErrorCode, GameError } from "./errors";
+import type { Card, GameState } from "./types";
 
 const BOARD_SIZE = 5;
 
@@ -46,11 +47,18 @@ export const applyMove = (
   const [toRow, toCol] = to;
 
   const piece = state.board[fromRow][fromCol];
-  if (!piece) throw new Error("No piece at the source position");
+  if (!piece)
+    throw new GameError(
+      ErrorCode.NO_PIECE_AT_SOURCE,
+      "No piece at the source position",
+    );
 
   const target = state.board[toRow][toCol];
   if (target && target.player === piece.player)
-    throw new Error("Cannot move to a cell occupied by a team piece");
+    throw new GameError(
+      ErrorCode.FRIENDLY_FIRE,
+      "Cannot move to a cell occupied by a team piece",
+    );
 
   const newBoard = state.board.map((row) => row.slice());
   newBoard[toRow][toCol] = piece;

@@ -1,4 +1,4 @@
-import { GameState } from "./types";
+import type { GameState } from "./types";
 
 export const checkWin = (state: GameState): "fox" | "tanuki" | null => {
   const foxNest = state.board[0][2];

@@ -50,7 +50,7 @@ export const applyMove = (
 
   const target = state.board[toRow][toCol];
   if (target && target.player === piece.player)
-    throw new Error("Cannot move to a cell occupied by own piece");
+    throw new Error("Cannot move to a cell occupied by a team piece");
 
   const newBoard = state.board.map((row) => row.slice());
   newBoard[toRow][toCol] = piece;

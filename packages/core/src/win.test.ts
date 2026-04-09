@@ -81,6 +81,19 @@ describe("checkWin", () => {
     expect(checkWin(state)).toBeNull();
   });
 
+  test("should return null if both bosses are captured simultaneously (draw)", () => {
+    const state = {
+      board: [
+        [null, null, null, null, null],
+        [null, { player: "fox", type: "sibling" }, null, null, null],
+        [null, null, null, null, null],
+        [null, { player: "tanuki", type: "sibling" }, null, null, null],
+        [null, null, null, null, null],
+      ],
+    } as GameState;
+    expect(checkWin(state)).toBeNull();
+  });
+
   test("should return null if a sibling piece is in opponent nests (fox)", () => {
     const state = {
       board: [

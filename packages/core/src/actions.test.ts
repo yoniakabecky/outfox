@@ -23,6 +23,14 @@ describe("selectCard", () => {
     expect(newState.selectedCard).toBe(cardToSelect);
   });
 
+  test("should select card from tanuki hand when currentTurn is tanuki", () => {
+    const state = { ...initialState, currentTurn: "tanuki" as const };
+    const newState = selectCard(state, cards.frog);
+
+    expect(newState.phase).toBe("select-piece");
+    expect(newState.selectedCard).toBe(cards.frog);
+  });
+
   test("should throw error if not in select-card phase", () => {
     const state = { ...initialState, phase: "select-piece" as const };
     const fn = () => selectCard(state, cards.tiger);

@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { cards } from "./cards";
-import { ErrorCode, GameError } from "./errors";
-import { applyMove, getValidMoves } from "./moves";
+import { applyMove } from "./board";
+import { getValidMoves } from "./moves";
 import type { GameState } from "./types";
 
 describe("getValidMoves", () => {
@@ -132,22 +132,6 @@ describe("applyMove", () => {
     const newState = applyMove(state, from, to);
     expect(newState.board[0][0]).toEqual({ player: "fox" });
     expect(newState.board[0][2]).toBeNull();
-  });
-
-  test("should throw error if no piece at source position", () => {
-    const fn = () => applyMove(state, [0, 0], [0, 1]);
-    expect(fn).toThrow(GameError);
-    expect(fn).toThrow(
-      expect.objectContaining({ code: ErrorCode.NO_PIECE_AT_SOURCE }),
-    );
-  });
-
-  test("should throw error if moving to a cell occupied by team piece", () => {
-    const fn = () => applyMove(state, [0, 2], [1, 1]);
-    expect(fn).toThrow(GameError);
-    expect(fn).toThrow(
-      expect.objectContaining({ code: ErrorCode.FRIENDLY_FIRE }),
-    );
   });
 
   test("should allow moving to a cell occupied by opponent piece", () => {

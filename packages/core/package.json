@@ -5,11 +5,13 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "test": "vitest",
+    "coverage": "vitest run --coverage",
     "dev": "tsc --watch",
     "build": "tsc",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
+    "@vitest/coverage-istanbul": "4.1.2",
     "vitest": "^4.1.2"
   }
 }

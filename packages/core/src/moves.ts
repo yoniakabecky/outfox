@@ -1,7 +1,5 @@
-import { ErrorCode, GameError } from "./errors";
+import { BOARD_SIZE } from "./board";
 import type { Card, GameState } from "./types";
-
-export const BOARD_SIZE = 5;
 
 export const getValidMoves = (
   state: GameState,
@@ -38,34 +36,12 @@ export const getValidMoves = (
   return validMoves;
 };
 
-export const applyMove = (
+export const isValidMove = (
   state: GameState,
   from: [number, number],
   to: [number, number],
-): GameState => {
-  const [fromRow, fromCol] = from;
-  const [toRow, toCol] = to;
-
-  const piece = state.board[fromRow][fromCol];
-  if (!piece)
-    throw new GameError(
-      ErrorCode.NO_PIECE_AT_SOURCE,
-      "No piece at the source position",
-    );
-
-  const target = state.board[toRow][toCol];
-  if (target && target.player === piece.player)
-    throw new GameError(
-      ErrorCode.FRIENDLY_FIRE,
-      "Cannot move to a cell occupied by a team piece",
-    );
-
-  const newBoard = state.board.map((row) => row.slice());
-  newBoard[toRow][toCol] = piece;
-  newBoard[fromRow][fromCol] = null;
-
-  return {
-    ...state,
-    board: newBoard,
-  };
+  card: Card,
+): boolean => {
+  const validMoves = getValidMoves(state, from, card);
+  return validMoves.some(([r, c]) => r === to[0] && c === to[1]);
 };

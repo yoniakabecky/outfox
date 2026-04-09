@@ -1,5 +1,6 @@
+import { BOARD_SIZE, applyMove } from "./board";
 import { ErrorCode, GameError } from "./errors";
-import { BOARD_SIZE, applyMove, getValidMoves } from "./moves";
+import { isValidMove } from "./moves";
 import { cycleCard } from "./state";
 import type { Card, GameState } from "./types";
 import { checkWin } from "./win";
@@ -38,19 +39,26 @@ export const makeMove = (
   if (!state.selectedCard)
     throw new GameError(ErrorCode.NO_CARD_SELECTED, "No card selected");
 
-  if (from[0] < 0 || from[0] >= BOARD_SIZE || from[1] < 0 || from[1] >= BOARD_SIZE)
-    throw new GameError(ErrorCode.OUT_OF_BOUNDS, "Source position is out of bounds");
+  const [fromRow, fromCol] = from;
+  if (
+    fromRow < 0 ||
+    fromRow >= BOARD_SIZE ||
+    fromCol < 0 ||
+    fromCol >= BOARD_SIZE
+  )
+    throw new GameError(
+      ErrorCode.OUT_OF_BOUNDS,
+      "Source position is out of bounds",
+    );
 
-  const piece = state.board[from[0]][from[1]];
+  const piece = state.board[fromRow][fromCol];
   if (!piece || piece.player !== state.currentTurn)
     throw new GameError(
       ErrorCode.OPPONENT_PIECE,
       "Cannot move opponent's piece",
     );
 
-  const isValid = getValidMoves(state, from, state.selectedCard).some(
-    ([r, c]) => r === to[0] && c === to[1],
-  );
+  const isValid = isValidMove(state, from, to, state.selectedCard);
   if (!isValid)
     throw new GameError(
       ErrorCode.INVALID_MOVE,

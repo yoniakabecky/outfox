@@ -1,32 +1,16 @@
+import { initialBoard } from "./board";
 import { dealCards } from "./cards";
 import { ErrorCode, GameError } from "./errors";
-import type { Board, Card, GameState, Hand } from "./types";
-
-const initialBoard: Board = [
-  [
-    { player: "fox", type: "sibling" },
-    { player: "fox", type: "sibling" },
-    { player: "fox", type: "boss" },
-    { player: "fox", type: "sibling" },
-    { player: "fox", type: "sibling" },
-  ],
-  [null, null, null, null, null],
-  [null, null, null, null, null],
-  [null, null, null, null, null],
-  [
-    { player: "tanuki", type: "sibling" },
-    { player: "tanuki", type: "sibling" },
-    { player: "tanuki", type: "boss" },
-    { player: "tanuki", type: "sibling" },
-    { player: "tanuki", type: "sibling" },
-  ],
-];
+import type { Card, GameState, Hand } from "./types";
 
 export const cycleCard = (state: GameState, usedCard: Card): GameState => {
   const isFox = state.currentTurn === "fox";
   const hand = isFox ? state.foxCards : state.tanukiCards;
   if (!hand.includes(usedCard)) {
-    throw new GameError(ErrorCode.CARD_NOT_IN_HAND, "Card does not belong to current player");
+    throw new GameError(
+      ErrorCode.CARD_NOT_IN_HAND,
+      "Card does not belong to current player",
+    );
   }
 
   const newHand = hand.map((c) =>

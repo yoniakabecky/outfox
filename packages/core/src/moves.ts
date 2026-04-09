@@ -1,7 +1,7 @@
 import { ErrorCode, GameError } from "./errors";
 import type { Card, GameState } from "./types";
 
-const BOARD_SIZE = 5;
+export const BOARD_SIZE = 5;
 
 export const getValidMoves = (
   state: GameState,
@@ -14,7 +14,7 @@ export const getValidMoves = (
 
   const player = cell.player;
 
-  // if player is tanuki, mirror the card moves vertically
+  // if player is fox, mirror the card moves vertically (cards are defined from tanuki's perspective)
   const moves =
     player === "fox" ? card.moves.map(([dr, dc]) => [-dr, -dc]) : card.moves;
 

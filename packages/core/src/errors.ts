@@ -7,6 +7,7 @@ export const ErrorCode = {
   INVALID_MOVE:       "INVALID_MOVE",       // destination not reachable with selected card
   NO_PIECE_AT_SOURCE: "NO_PIECE_AT_SOURCE", // applyMove called with empty source cell
   FRIENDLY_FIRE:      "FRIENDLY_FIRE",      // tried to move onto own piece
+  OUT_OF_BOUNDS:      "OUT_OF_BOUNDS",      // source position is outside the board
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

@@ -1,8 +1,7 @@
-import { BOARD_SIZE, applyMove } from "./board";
+import { applyMove, BOARD_SIZE } from "./board";
 import { ErrorCode, GameError } from "./errors";
 import { isValidMove } from "./moves";
-import { cycleCard } from "./state";
-import type { Card, GameState } from "./types";
+import type { Card, GameState, Hand } from "./types";
 import { checkWin } from "./win";
 
 export const selectCard = (state: GameState, card: Card): GameState => {
@@ -26,6 +25,29 @@ export const cancelSelection = (state: GameState): GameState => {
     ...state,
     phase: "select-card",
     selectedCard: null,
+  };
+};
+
+export const cycleCard = (state: GameState, usedCard: Card): GameState => {
+  const isFox = state.currentTurn === "fox";
+  const hand = isFox ? state.foxCards : state.tanukiCards;
+  if (!hand.includes(usedCard)) {
+    throw new GameError(
+      ErrorCode.CARD_NOT_IN_HAND,
+      "Card does not belong to current player",
+    );
+  }
+
+  const newHand = hand.map((c) =>
+    c === usedCard ? state.waitingCard : c,
+  ) as Hand;
+
+  return {
+    ...state,
+    foxCards: isFox ? newHand : state.foxCards,
+    tanukiCards: isFox ? state.tanukiCards : newHand,
+    waitingCard: usedCard,
+    currentTurn: isFox ? "tanuki" : "fox",
   };
 };
 

@@ -178,4 +178,12 @@ describe("makeMove", () => {
       expect.objectContaining({ code: ErrorCode.OPPONENT_PIECE }),
     );
   });
+
+  test("should throw error if from position is outside the board", () => {
+    const fn = () => makeMove(state as GameState, [-1, 0], [0, 0]);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.OUT_OF_BOUNDS }),
+    );
+  });
 });

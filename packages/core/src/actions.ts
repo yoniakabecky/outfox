@@ -1,5 +1,5 @@
 import { ErrorCode, GameError } from "./errors";
-import { applyMove, getValidMoves } from "./moves";
+import { BOARD_SIZE, applyMove, getValidMoves } from "./moves";
 import { cycleCard } from "./state";
 import type { Card, GameState } from "./types";
 import { checkWin } from "./win";
@@ -38,6 +38,9 @@ export const makeMove = (
   if (!state.selectedCard)
     throw new GameError(ErrorCode.NO_CARD_SELECTED, "No card selected");
 
+  if (from[0] < 0 || from[0] >= BOARD_SIZE || from[1] < 0 || from[1] >= BOARD_SIZE)
+    throw new GameError(ErrorCode.OUT_OF_BOUNDS, "Source position is out of bounds");
+
   const piece = state.board[from[0]][from[1]];
   if (!piece || piece.player !== state.currentTurn)
     throw new GameError(
@@ -55,18 +58,18 @@ export const makeMove = (
     );
 
   const afterMove = applyMove(state, from, to);
-  const afterCycle = cycleCard(afterMove, state.selectedCard);
-  const winner = checkWin(afterCycle);
+  const winner = checkWin(afterMove);
 
   if (winner) {
     return {
-      ...afterCycle,
+      ...afterMove,
       phase: "game-over",
       winner,
       selectedCard: null,
     };
   }
 
+  const afterCycle = cycleCard(afterMove, state.selectedCard);
   return {
     ...afterCycle,
     phase: "select-card",

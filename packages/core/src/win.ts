@@ -31,6 +31,12 @@ export const checkWin = (state: GameState): "fox" | "tanuki" | null => {
     }
   }
 
+  if (foxBossCaptured && tanukiBossCaptured) {
+    // This should never happen in a normal game, but if it does, it's a draw.
+    // For simplicity, we'll just return null.
+    return null;
+  }
+
   if (foxBossCaptured) return "tanuki";
   if (tanukiBossCaptured) return "fox";
 

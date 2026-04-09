@@ -1,4 +1,5 @@
 import { dealCards } from "./cards";
+import { ErrorCode, GameError } from "./errors";
 import type { Board, Card, GameState, Hand } from "./types";
 
 const initialBoard: Board = [
@@ -25,7 +26,7 @@ export const cycleCard = (state: GameState, usedCard: Card): GameState => {
   const isFox = state.currentTurn === "fox";
   const hand = isFox ? state.foxCards : state.tanukiCards;
   if (!hand.includes(usedCard)) {
-    return state;
+    throw new GameError(ErrorCode.CARD_NOT_IN_HAND, "Card does not belong to current player");
   }
 
   const newHand = hand.map((c) =>
@@ -45,7 +46,7 @@ export const initState = (): GameState => {
   const cards = dealCards();
 
   return {
-    board: [...initialBoard],
+    board: initialBoard.map((row) => row.slice()),
     foxCards: [cards[0], cards[2]],
     tanukiCards: [cards[1], cards[3]],
     waitingCard: cards[4],

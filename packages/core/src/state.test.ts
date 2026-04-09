@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { GameError } from "./errors";
 import { cycleCard, initState } from "./state";
 
 describe("initState", () => {
@@ -92,15 +93,12 @@ describe("cycleCard", () => {
     expect(newState.foxCards.indexOf(state.waitingCard)).toBe(1);
   });
 
-  test("should not change hand if used card is not in current player's hand", () => {
+  test("should throw if used card is not in current player's hand", () => {
     const state = { ...initState(), currentTurn: "fox" as const };
     const invalidCard = state.tanukiCards[0];
-    const newState = cycleCard(state, invalidCard);
 
-    expect(newState.foxCards).toEqual(state.foxCards);
-    expect(newState.tanukiCards).toEqual(state.tanukiCards);
-    expect(newState.waitingCard).toBe(state.waitingCard);
-    expect(newState.currentTurn).toBe("fox");
+    expect(() => cycleCard(state, invalidCard)).toThrow(GameError);
+    expect(() => cycleCard(state, invalidCard)).toThrow("Card does not belong to current player");
   });
 
   test("should not mutate the original state", () => {

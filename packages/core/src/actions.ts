@@ -31,9 +31,10 @@ export const cancelSelection = (state: GameState): GameState => {
 const cycleCard = (state: GameState, usedCard: Card): GameState => {
   const isFox = state.currentTurn === "fox";
   const hand = isFox ? state.foxCards : state.tanukiCards;
-  const newHand = hand.map((c) =>
-    c === usedCard ? state.waitingCard : c,
-  ) as Hand;
+  const newHand: Hand = [
+    hand[0] === usedCard ? state.waitingCard : hand[0],
+    hand[1] === usedCard ? state.waitingCard : hand[1],
+  ];
 
   return {
     ...state,

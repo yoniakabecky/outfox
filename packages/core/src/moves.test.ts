@@ -5,14 +5,14 @@ import type { GameState } from "./types";
 
 describe("getValidMoves", () => {
   const board = [
-    [null, null, { player: "fox" }, null, null],
-    [null, { player: "fox" }, null, null, null],
-    [null, null, { player: "tanuki" }, null, null],
+    [null, null, { player: "fox", type: "boss" }, null, null],
+    [null, { player: "fox", type: "sibling" }, null, null, null],
+    [null, null, { player: "tanuki", type: "sibling" }, null, null],
     [null, null, null, null, null],
     [null, null, null, { player: "tanuki" }, null],
   ];
 
-  test("should returns valid moves for a piece (fox)", () => {
+  test("should return valid moves for a piece (fox)", () => {
     const piecePos = [1, 1] as [number, number];
     const validMoves = getValidMoves(
       { board } as GameState,
@@ -25,7 +25,7 @@ describe("getValidMoves", () => {
     ]);
   });
 
-  test("should returns valid moves for a piece (tanuki)", () => {
+  test("should return valid moves for a piece (tanuki)", () => {
     const piecePos = [4, 3] as [number, number];
     const validMoves = getValidMoves(
       { board } as GameState,
@@ -38,7 +38,7 @@ describe("getValidMoves", () => {
     ]);
   });
 
-  test("should returns empty array if piece position is out of bounds", () => {
+  test("should return empty array if piece position is out of bounds", () => {
     const piecePos = [5, 5] as [number, number];
     const validMoves = getValidMoves(
       { board } as GameState,
@@ -48,7 +48,7 @@ describe("getValidMoves", () => {
     expect(validMoves).toEqual([]);
   });
 
-  test("should returns empty array if no piece at position", () => {
+  test("should return empty array if no piece at position", () => {
     const piecePos = [0, 0] as [number, number];
     const validMoves = getValidMoves(
       { board } as GameState,

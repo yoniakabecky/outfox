@@ -7,6 +7,7 @@ export const getValidMoves = (
   card: Card,
 ): [number, number][] => {
   const [row, col] = piecePos;
+  if (!validatePosition(row, col)) return [];
   const cell = state.board[row][col];
   if (!cell) return [];
 

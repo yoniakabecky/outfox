@@ -38,6 +38,16 @@ describe("getValidMoves", () => {
     ]);
   });
 
+  test("should returns empty array if piece position is out of bounds", () => {
+    const piecePos = [5, 5] as [number, number];
+    const validMoves = getValidMoves(
+      { board } as GameState,
+      piecePos,
+      cards.tiger,
+    );
+    expect(validMoves).toEqual([]);
+  });
+
   test("should returns empty array if no piece at position", () => {
     const piecePos = [0, 0] as [number, number];
     const validMoves = getValidMoves(

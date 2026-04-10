@@ -1,4 +1,4 @@
-import { BOARD_SIZE } from "./board";
+import { validatePosition } from "./board";
 import type { Card, GameState } from "./types";
 
 export const getValidMoves = (
@@ -24,7 +24,7 @@ export const getValidMoves = (
     const nc = col + dc;
 
     // check if move is within board bounds
-    if (nr < 0 || nr >= BOARD_SIZE || nc < 0 || nc >= BOARD_SIZE) continue;
+    if (!validatePosition(nr, nc)) continue;
 
     // check if move is valid (not occupied by own piece)
     const targetCell = state.board[nr][nc];

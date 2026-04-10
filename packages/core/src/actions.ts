@@ -1,4 +1,4 @@
-import { applyMove, BOARD_SIZE } from "./board";
+import { applyMove, validatePosition } from "./board";
 import { ErrorCode, GameError } from "./errors";
 import { isValidMove } from "./moves";
 import type { Card, GameState, Hand } from "./types";
@@ -62,12 +62,7 @@ export const makeMove = (
     throw new GameError(ErrorCode.NO_CARD_SELECTED, "No card selected");
 
   const [fromRow, fromCol] = from;
-  if (
-    fromRow < 0 ||
-    fromRow >= BOARD_SIZE ||
-    fromCol < 0 ||
-    fromCol >= BOARD_SIZE
-  )
+  if (!validatePosition(fromRow, fromCol))
     throw new GameError(
       ErrorCode.OUT_OF_BOUNDS,
       "Source position is out of bounds",

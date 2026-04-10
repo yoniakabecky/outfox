@@ -1,6 +1,6 @@
 import { applyMove, validatePosition } from "./board";
 import { ErrorCode, GameError } from "./errors";
-import { isValidMove } from "./moves";
+import { validateMove } from "./moves";
 import type { Card, GameState, Hand } from "./types";
 import { checkWin } from "./win";
 
@@ -80,7 +80,7 @@ export const makeMove = (
       "Cannot move opponent's piece",
     );
 
-  const isValid = isValidMove(state, from, to, state.selectedCard);
+  const isValid = validateMove(state, from, to, state.selectedCard);
   if (!isValid)
     throw new GameError(
       ErrorCode.INVALID_MOVE,

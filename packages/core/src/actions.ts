@@ -54,8 +54,7 @@ export const makeMove = (
   if (!state.selectedCard)
     throw new GameError(ErrorCode.NO_CARD_SELECTED, "No card selected");
 
-  const [fromRow, fromCol] = from;
-  if (!validatePosition(fromRow, fromCol))
+  if (!validatePosition(...from))
     throw new GameError(
       ErrorCode.OUT_OF_BOUNDS,
       "Source position is out of bounds",
@@ -66,6 +65,7 @@ export const makeMove = (
       "Target position is out of bounds",
     );
 
+  const [fromRow, fromCol] = from;
   const piece = state.board[fromRow][fromCol];
   if (!piece)
     throw new GameError(

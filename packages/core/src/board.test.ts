@@ -21,11 +21,11 @@ describe("validatePosition", () => {
 describe("applyMove", () => {
   const state = {
     board: [
-      [null, null, { player: "fox" }, null, null],
-      [null, { player: "fox" }, null, null, null],
-      [null, null, { player: "tanuki" }, null, null],
+      [null, null, { player: "fox", type: "boss" }, null, null],
+      [null, { player: "fox", type: "sibling" }, null, null, null],
+      [null, null, { player: "tanuki", type: "boss" }, null, null],
       [null, null, null, null, null],
-      [null, null, null, { player: "tanuki" }, null],
+      [null, null, null, { player: "tanuki", type: "sibling" }, null],
     ],
   } as GameState;
 
@@ -33,7 +33,7 @@ describe("applyMove", () => {
     const from = [4, 3] as [number, number];
     const to = [3, 3] as [number, number];
     const newState = applyMove(state, from, to);
-    expect(newState.board[3][3]).toEqual({ player: "tanuki" });
+    expect(newState.board[3][3]).toEqual({ player: "tanuki", type: "sibling" });
     expect(newState.board[4][3]).toBeNull();
   });
 
@@ -41,7 +41,7 @@ describe("applyMove", () => {
     const from = [0, 2] as [number, number];
     const to = [0, 0] as [number, number];
     const newState = applyMove(state, from, to);
-    expect(newState.board[0][0]).toEqual({ player: "fox" });
+    expect(newState.board[0][0]).toEqual({ player: "fox", type: "boss" });
     expect(newState.board[0][2]).toBeNull();
   });
 
@@ -49,7 +49,7 @@ describe("applyMove", () => {
     const from = [0, 2] as [number, number]; // fox piece
     const to = [2, 2] as [number, number]; // tanuki piece
     const newState = applyMove(state, from, to);
-    expect(newState.board[2][2]).toEqual({ player: "fox" });
+    expect(newState.board[2][2]).toEqual({ player: "fox", type: "boss" });
     expect(newState.board[0][2]).toBeNull();
   });
 
@@ -59,9 +59,9 @@ describe("applyMove", () => {
     const newState = applyMove(state, from, to);
     // newState should reflect the move
     expect(newState.board[0][2]).toBeNull();
-    expect(newState.board[0][0]).toEqual({ player: "fox" });
+    expect(newState.board[0][0]).toEqual({ player: "fox", type: "boss" });
     // original state should remain unchanged
-    expect(state.board[0][2]).toEqual({ player: "fox" });
+    expect(state.board[0][2]).toEqual({ player: "fox", type: "boss" });
     expect(state.board[0][0]).toBeNull();
   });
 });

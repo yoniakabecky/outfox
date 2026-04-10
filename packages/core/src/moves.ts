@@ -36,7 +36,7 @@ export const getValidMoves = (
   return validMoves;
 };
 
-export const isValidMove = (
+export const validateMove = (
   state: GameState,
   from: [number, number],
   to: [number, number],

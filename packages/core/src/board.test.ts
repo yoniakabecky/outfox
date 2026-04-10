@@ -1,6 +1,22 @@
 import { describe, expect, test } from "vitest";
-import { applyMove } from "./board";
+import { applyMove, validatePosition } from "./board";
 import type { GameState } from "./types";
+
+describe("validatePosition", () => {
+  test("should return true for valid positions", () => {
+    expect(validatePosition(0, 0)).toBe(true);
+    expect(validatePosition(4, 4)).toBe(true);
+    expect(validatePosition(2, 3)).toBe(true);
+  });
+
+  test("should return false for invalid positions", () => {
+    expect(validatePosition(-1, 0)).toBe(false);
+    expect(validatePosition(0, -1)).toBe(false);
+    expect(validatePosition(5, 0)).toBe(false);
+    expect(validatePosition(0, 5)).toBe(false);
+    expect(validatePosition(5, 5)).toBe(false);
+  });
+});
 
 describe("applyMove", () => {
   const state = {

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { GameState } from "./types";
 import { checkWin } from "./win";
+import { GameError } from "./errors";
 
 describe("checkWin", () => {
   test("should return null for ongoing game", () => {
@@ -81,7 +82,7 @@ describe("checkWin", () => {
     expect(checkWin(state)).toBeNull();
   });
 
-  test("should return null if both bosses are captured simultaneously (draw)", () => {
+  test("should return error if both bosses are captured simultaneously (draw)", () => {
     const state = {
       board: [
         [null, null, null, null, null],
@@ -91,7 +92,10 @@ describe("checkWin", () => {
         [null, null, null, null, null],
       ],
     } as GameState;
-    expect(checkWin(state)).toBeNull();
+    expect(() => checkWin(state)).toThrow(GameError);
+    expect(() => checkWin(state)).toThrow(
+      expect.objectContaining({ code: "INVALID_GAME_STATE" }),
+    );
   });
 
   test("should return null if a sibling piece is in opponent nests (fox)", () => {

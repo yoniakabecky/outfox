@@ -243,6 +243,14 @@ describe("makeMove", () => {
     );
   });
 
+  test("should throw error if there is no piece at source position", () => {
+    const fn = () => makeMove(state as GameState, [0, 0], [0, 1]);
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.NO_PIECE_AT_SOURCE }),
+    );
+  });
+
   test("should throw error if selected piece belongs to the opponent", () => {
     // [2,2] is a tanuki piece; fox cannot move it
     const fn = () => makeMove(state as GameState, [2, 2], [1, 2]);

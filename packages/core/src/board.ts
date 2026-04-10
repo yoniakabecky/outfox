@@ -1,6 +1,6 @@
 import type { Board, GameState } from "./types";
 
-const BOARD_SIZE = 5;
+export const BOARD_SIZE = 5;
 
 export const initialBoard: Board = [
   [

@@ -1,8 +1,10 @@
+import { BOARD_SIZE } from "./board";
 import type { GameState } from "./types";
 
 export const checkWin = (state: GameState): "fox" | "tanuki" | null => {
-  const foxNest = state.board[0][2];
-  const tanukiNest = state.board[4][2];
+  const centerCol = Math.floor(BOARD_SIZE / 2);
+  const foxNest = state.board[0][centerCol];
+  const tanukiNest = state.board[BOARD_SIZE - 1][centerCol];
 
   // Check if fox boss is in tanuki nest
   if (tanukiNest && tanukiNest.player === "fox" && tanukiNest.type === "boss") {

@@ -6,8 +6,8 @@ export const ErrorCode = {
   OPPONENT_PIECE:     "OPPONENT_PIECE",     // tried to move the opponent's piece
   INVALID_MOVE:       "INVALID_MOVE",       // destination not reachable with selected card
   NO_PIECE_AT_SOURCE: "NO_PIECE_AT_SOURCE", // applyMove called with empty source cell
-  FRIENDLY_FIRE:      "FRIENDLY_FIRE",      // tried to move onto own piece
   OUT_OF_BOUNDS:      "OUT_OF_BOUNDS",      // source position is outside the board
+  INVALID_GAME_STATE: "INVALID_GAME_STATE", // e.g. both bosses captured at the same time (should never happen)
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];

@@ -1,4 +1,5 @@
 import { BOARD_SIZE } from "./board";
+import { GameError } from "./errors";
 import type { GameState } from "./types";
 
 export const checkWin = (state: GameState): "fox" | "tanuki" | null => {
@@ -34,9 +35,7 @@ export const checkWin = (state: GameState): "fox" | "tanuki" | null => {
   }
 
   if (foxBossCaptured && tanukiBossCaptured) {
-    // This should never happen in a normal game, but if it does, it's a draw.
-    // For simplicity, we'll just return null.
-    return null;
+    throw new GameError("INVALID_GAME_STATE", "Both bosses are captured.");
   }
 
   if (foxBossCaptured) return "tanuki";

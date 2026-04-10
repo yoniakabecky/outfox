@@ -28,16 +28,9 @@ export const cancelSelection = (state: GameState): GameState => {
   };
 };
 
-export const cycleCard = (state: GameState, usedCard: Card): GameState => {
+const cycleCard = (state: GameState, usedCard: Card): GameState => {
   const isFox = state.currentTurn === "fox";
   const hand = isFox ? state.foxCards : state.tanukiCards;
-  if (!hand.includes(usedCard)) {
-    throw new GameError(
-      ErrorCode.CARD_NOT_IN_HAND,
-      "Card does not belong to current player",
-    );
-  }
-
   const newHand = hand.map((c) =>
     c === usedCard ? state.waitingCard : c,
   ) as Hand;

@@ -1,8 +1,7 @@
 import { describe, expect, test } from "vitest";
-import { cancelSelection, cycleCard, makeMove, selectCard } from "./actions";
+import { cancelSelection, makeMove, selectCard } from "./actions";
 import { cards } from "./cards";
 import { ErrorCode, GameError } from "./errors";
-import { initState } from "./state";
 import type { GameState } from "./types";
 
 describe("selectCard", () => {
@@ -71,70 +70,6 @@ describe("cancelSelection", () => {
     expect(fn).toThrow(
       expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
     );
-  });
-});
-
-describe("cycleCard", () => {
-  test("should cycle the card and switch turns correctly (fox)", () => {
-    const state = { ...initState(), currentTurn: "fox" as const };
-    const usedCard = state.foxCards[0];
-    const newState = cycleCard(state, usedCard);
-
-    expect(newState.waitingCard).toBe(usedCard);
-    expect(newState.currentTurn).toBe("tanuki");
-    expect(newState.foxCards).toContain(state.waitingCard);
-    expect(newState.foxCards).not.toContain(usedCard);
-    expect(newState.tanukiCards).toEqual(state.tanukiCards);
-  });
-
-  test("should cycle the card and switch turns correctly (tanuki)", () => {
-    const state = { ...initState(), currentTurn: "tanuki" as const };
-    const usedCard = state.tanukiCards[0];
-    const newState = cycleCard(state, usedCard);
-
-    expect(newState.waitingCard).toBe(usedCard);
-    expect(newState.currentTurn).toBe("fox");
-    expect(newState.tanukiCards).toContain(state.waitingCard);
-    expect(newState.tanukiCards).not.toContain(usedCard);
-    expect(newState.foxCards).toEqual(state.foxCards);
-  });
-
-  test("should cycle the second card in the hand (index 1)", () => {
-    const state = { ...initState(), currentTurn: "fox" as const };
-    const usedCard = state.foxCards[1];
-    const newState = cycleCard(state, usedCard);
-
-    expect(newState.waitingCard).toBe(usedCard);
-    expect(newState.foxCards[1]).toBe(state.waitingCard);
-    expect(newState.foxCards[0]).toBe(state.foxCards[0]);
-  });
-
-  test("should place the waiting card at the same index as the used card", () => {
-    const state = { ...initState(), currentTurn: "fox" as const };
-    const usedCard = state.foxCards[1];
-    const newState = cycleCard(state, usedCard);
-
-    expect(newState.foxCards.indexOf(state.waitingCard)).toBe(1);
-  });
-
-  test("should throw if used card is not in current player's hand", () => {
-    const state = { ...initState(), currentTurn: "fox" as const };
-    const invalidCard = state.tanukiCards[0];
-
-    expect(() => cycleCard(state, invalidCard)).toThrow(GameError);
-    expect(() => cycleCard(state, invalidCard)).toThrow(
-      "Card does not belong to current player",
-    );
-  });
-
-  test("should not mutate the original state", () => {
-    const state = { ...initState(), currentTurn: "fox" as const };
-    const originalFoxCards = state.foxCards;
-    const originalWaitingCard = state.waitingCard;
-    cycleCard(state, state.foxCards[0]);
-
-    expect(state.foxCards).toBe(originalFoxCards);
-    expect(state.waitingCard).toBe(originalWaitingCard);
   });
 });
 
@@ -274,5 +209,40 @@ describe("makeMove", () => {
     expect(fn).toThrow(
       expect.objectContaining({ code: ErrorCode.OUT_OF_BOUNDS }),
     );
+  });
+
+  test("should cycle card and switch turns for tanuki", () => {
+    const tanukiState = {
+      ...state,
+      board: [
+        [null, null, { player: "fox", type: "boss" }, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, { player: "tanuki", type: "sibling" }, null, { player: "tanuki", type: "boss" }, null],
+      ],
+      currentTurn: "tanuki" as const,
+      selectedCard: cards.frog, // tanuki frog moves: [0,-2],[−1,−1],[1,1]; from [4,1] → [3,0] valid
+    } as GameState;
+    const newState = makeMove(tanukiState, [4, 1], [3, 0]);
+
+    expect(newState.currentTurn).toBe("fox");
+    expect(newState.waitingCard).toBe(cards.frog);
+    expect(newState.tanukiCards).toContain(cards.hawk); // old waitingCard enters hand
+    expect(newState.tanukiCards).not.toContain(cards.frog);
+    expect(newState.phase).toBe("select-card");
+  });
+
+  test("should place the waiting card at the same hand index as the used card", () => {
+    // Use foxCards[1] = dragon; dragon fox moves from [1,1]: [2,3],[2,-1 OOB],[0,2 own],[0,0]
+    const newState = makeMove(
+      { ...state, selectedCard: cards.dragon } as GameState,
+      [1, 1],
+      [2, 3],
+    );
+
+    expect(newState.foxCards[1]).toBe(cards.hawk); // waiting card fills slot 1 (dragon's slot)
+    expect(newState.foxCards[0]).toBe(cards.tiger); // slot 0 unchanged
+    expect(newState.waitingCard).toBe(cards.dragon); // used card becomes new waiting
   });
 });

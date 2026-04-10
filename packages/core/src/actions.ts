@@ -67,6 +67,11 @@ export const makeMove = (
       ErrorCode.OUT_OF_BOUNDS,
       "Source position is out of bounds",
     );
+  if (!validatePosition(...to))
+    throw new GameError(
+      ErrorCode.OUT_OF_BOUNDS,
+      "Target position is out of bounds",
+    );
 
   const piece = state.board[fromRow][fromCol];
   if (!piece)

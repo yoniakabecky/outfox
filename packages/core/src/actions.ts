@@ -74,7 +74,12 @@ export const makeMove = (
     );
 
   const piece = state.board[fromRow][fromCol];
-  if (!piece || piece.player !== state.currentTurn)
+  if (!piece)
+    throw new GameError(
+      ErrorCode.NO_PIECE_AT_SOURCE,
+      "No piece at source position",
+    );
+  if (piece.player !== state.currentTurn)
     throw new GameError(
       ErrorCode.OPPONENT_PIECE,
       "Cannot move opponent's piece",

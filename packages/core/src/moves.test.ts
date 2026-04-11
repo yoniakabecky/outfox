@@ -14,27 +14,30 @@ describe("getValidMoves", () => {
 
   test("should return valid moves for a piece (fox)", () => {
     const piecePos = [1, 1] as [number, number];
+    // hawk fox-mirrored moves from [1,1]: [+2,0],[+1,-1],[+1,+1] → [3,1],[2,0],[2,2]
     const validMoves = getValidMoves(
       { board } as GameState,
       piecePos,
-      cards.tiger,
+      cards.hawk,
     );
     expect(validMoves).toEqual([
       [3, 1],
-      [0, 1],
+      [2, 0],
+      [2, 2],
     ]);
   });
 
   test("should return valid moves for a piece (tanuki)", () => {
     const piecePos = [4, 3] as [number, number];
+    // frog tanuki moves from [4,3]: [-2,0],[0,-1],[1,1] → [2,3],[4,2],[5,4 OOB]
     const validMoves = getValidMoves(
       { board } as GameState,
       piecePos,
       cards.frog,
     );
     expect(validMoves).toEqual([
-      [4, 1],
-      [3, 2],
+      [2, 3],
+      [4, 2],
     ]);
   });
 
@@ -43,7 +46,7 @@ describe("getValidMoves", () => {
     const validMoves = getValidMoves(
       { board } as GameState,
       piecePos,
-      cards.tiger,
+      cards.hawk,
     );
     expect(validMoves).toEqual([]);
   });
@@ -53,65 +56,72 @@ describe("getValidMoves", () => {
     const validMoves = getValidMoves(
       { board } as GameState,
       piecePos,
-      cards.tiger,
+      cards.hawk,
     );
     expect(validMoves).toEqual([]);
   });
 
   test("should not return moves that team piece occupies (fox)", () => {
     const piecePos = [1, 1] as [number, number];
-    const validMoves = getValidMoves(
-      { board } as GameState,
-      piecePos,
-      cards.dragon,
-    );
-    expect(validMoves).toEqual([
-      [2, 3],
-      [0, 0],
-      // [0, 2] is occupied by a team piece
-    ]);
-  });
-
-  test("should return moves that opponent team piece occupies (tanuki)", () => {
-    const piecePos = [2, 2] as [number, number];
+    // monkey fox-mirrored from [1,1]: [+1,-1],[+1,+1],[-1,-1],[-1,+1] → [2,0],[2,2],[0,0],[0,2]
+    // [0,2] is occupied by a team piece (fox boss)
     const validMoves = getValidMoves(
       { board } as GameState,
       piecePos,
       cards.monkey,
     );
     expect(validMoves).toEqual([
-      [1, 1], // occupied by an opponent piece
+      [2, 0],
+      [2, 2],
+      [0, 0],
+    ]);
+  });
+
+  test("should return moves that opponent team piece occupies (tanuki)", () => {
+    const piecePos = [2, 2] as [number, number];
+    // monkey tanuki moves from [2,2]: [-1,+1],[-1,-1],[+1,+1],[+1,-1] → [1,3],[1,1],[3,3],[3,1]
+    // [1,1] is occupied by an opponent piece (fox sibling)
+    const validMoves = getValidMoves(
+      { board } as GameState,
+      piecePos,
+      cards.monkey,
+    );
+    expect(validMoves).toEqual([
       [1, 3],
-      [3, 1],
+      [1, 1],
       [3, 3],
+      [3, 1],
     ]);
   });
 
   test("should not return moves that are out of board bounds", () => {
     const piecePos = [0, 2] as [number, number];
+    // frog fox-mirrored from [0,2]: [+2,0],[0,+1],[-1,-1] → [2,2],[0,3],[-1,1 OOB]
     const validMoves = getValidMoves(
       { board } as GameState,
       piecePos,
-      cards.tiger,
+      cards.frog,
     );
     expect(validMoves).toEqual([
       [2, 2],
-      // [-2, 2] is out of bounds
+      [0, 3],
+      // [-1,1] is out of bounds
     ]);
   });
 
   test("should return empty array if all moves are invalid", () => {
     const state = {
       board: [
-        [null, null, { player: "fox" }, null, null],
-        [null, { player: "tanuki" }, null, null, null],
-        [null, null, { player: "fox" }, null, null],
+        [{ player: "fox" }, null, { player: "fox", type: "boss" }, null, { player: "fox" }],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
         [null, null, null, null, null],
         [null, null, null, { player: "tanuki" }, null],
       ],
     } as GameState;
     const piecePos = [0, 2] as [number, number];
-    const validMoves = getValidMoves(state, piecePos, cards.tiger);
+    // deer fox-mirrored from [0,2]: [0,-2],[0,+2],[-1,0] → [0,0 own],[0,4 own],[-1,2 OOB]
+    const validMoves = getValidMoves(state, piecePos, cards.deer);
     expect(validMoves).toEqual([]);
   });
 });

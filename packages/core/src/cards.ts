@@ -1,29 +1,11 @@
 import type { Card, CardName } from "./types";
 
 export const cards: Record<CardName, Card> = {
-  tiger: {
-    name: "tiger",
-    moves: [
-      [-2, 0],
-      [1, 0],
-    ],
-    stamp: "fox",
-  },
-  dragon: {
-    name: "dragon",
-    moves: [
-      [-1, -2],
-      [-1, 2],
-      [1, -1],
-      [1, 1],
-    ],
-    stamp: "tanuki",
-  },
   frog: {
     name: "frog",
     moves: [
-      [0, -2],
-      [-1, -1],
+      [-2, 0],
+      [0, -1],
       [1, 1],
     ],
     stamp: "fox",
@@ -31,103 +13,29 @@ export const cards: Record<CardName, Card> = {
   rabbit: {
     name: "rabbit",
     moves: [
-      [0, 2],
-      [-1, 1],
-      [1, -1],
-    ],
-    stamp: "tanuki",
-  },
-  crane: {
-    name: "crane",
-    moves: [
       [-1, 0],
-      [1, -1],
-      [1, 1],
+      [-2, 0],
+      [-1, 1],
     ],
     stamp: "tanuki",
-  },
-  elephant: {
-    name: "elephant",
-    moves: [
-      [-1, -1],
-      [-1, 1],
-      [0, -1],
-      [0, 1],
-    ],
-    stamp: "fox",
   },
   monkey: {
     name: "monkey",
     moves: [
-      [-1, -1],
       [-1, 1],
-      [1, -1],
+      [-1, -1],
       [1, 1],
+      [1, -1],
     ],
     stamp: "tanuki",
-  },
-  weasel: {
-    name: "weasel",
-    moves: [
-      [-1, -1],
-      [-1, 1],
-      [1, 0],
-    ],
-    stamp: "fox",
   },
   horse: {
     name: "horse",
     moves: [
-      [-1, 0],
-      [1, 0],
-      [0, -1],
-    ],
-    stamp: "fox",
-  },
-  ox: {
-    name: "ox",
-    moves: [
-      [-1, 0],
-      [1, 0],
-      [0, 1],
-    ],
-    stamp: "tanuki",
-  },
-  goose: {
-    name: "goose",
-    moves: [
-      [0, -1],
-      [-1, -1],
-      [0, 1],
-      [1, 1],
-    ],
-    stamp: "fox",
-  },
-  rooster: {
-    name: "rooster",
-    moves: [
-      [0, 1],
-      [-1, 1],
-      [0, -1],
-      [1, -1],
-    ],
-    stamp: "tanuki",
-  },
-  snake: {
-    name: "snake",
-    moves: [
-      [-1, -1],
-      [1, -1],
-      [0, 1],
-    ],
-    stamp: "tanuki",
-  },
-  cobra: {
-    name: "cobra",
-    moves: [
-      [-1, 1],
-      [1, 1],
-      [0, -1],
+      [-2, 1],
+      [-2, -1],
+      [-1, 2],
+      [-1, -2],
     ],
     stamp: "fox",
   },
@@ -135,17 +43,55 @@ export const cards: Record<CardName, Card> = {
     name: "boar",
     moves: [
       [-1, 0],
-      [0, -1],
-      [0, 1],
+      [-2, 0],
+      [-3, 0],
     ],
     stamp: "fox",
   },
   hawk: {
     name: "hawk",
     moves: [
-      [-1, 0],
-      [0, -2],
+      [-2, 0],
+      [-1, 1],
+      [-1, -1],
+    ],
+    stamp: "tanuki",
+  },
+  deer: {
+    name: "deer",
+    moves: [
       [0, 2],
+      [0, -2],
+      [1, 0],
+    ],
+    stamp: "fox",
+  },
+  bear: {
+    name: "bear",
+    moves: [
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ],
+    stamp: "tanuki",
+  },
+  squirrel: {
+    name: "squirrel",
+    moves: [
+      [0, 1],
+      [0, -1],
+      [-1, 1],
+      [1, -1],
+    ],
+    stamp: "fox",
+  },
+  goat: {
+    name: "goat",
+    moves: [
+      [-1, 0],
+      [1, 0],
+      [-1, 1],
+      [-1, -1],
     ],
     stamp: "tanuki",
   },

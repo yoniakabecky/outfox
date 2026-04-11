@@ -81,10 +81,12 @@ Error codes: `WRONG_PHASE`, `CARD_NOT_IN_HAND`, `NO_CARD_SELECTED`, `OPPONENT_PI
 ```ts
 import { cards } from "@outfox/core";
 
-cards.tiger; // { name, moves: [[dr, dc], ...], stamp: "fox" | "tanuki" }
+cards.hawk; // { name, moves: [[dr, dc], ...], stamp: "fox" | "tanuki" }
 ```
 
-16 cards available: tiger, dragon, frog, rabbit, crane, elephant, monkey, weasel, horse, ox, goose, rooster, snake, cobra, boar, hawk.
+10 cards available: frog, rabbit, monkey, horse, boar, hawk, deer, bear, squirrel, goat.
+
+Move offsets are `[dr, dc]` defined from tanuki's perspective (negative `dr` = forward). Fox moves are mirrored automatically at runtime.
 
 ## Types
 

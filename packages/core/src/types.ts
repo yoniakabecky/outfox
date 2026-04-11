@@ -4,22 +4,16 @@ type Cell = { player: Player; type: PieceType } | null;
 type Board = Cell[][]; // [row][col], 5×5
 
 type CardName =
-  | "tiger"
-  | "dragon"
   | "frog"
   | "rabbit"
-  | "crane"
-  | "elephant"
   | "monkey"
-  | "weasel" // original "mantis"
   | "horse"
-  | "ox"
-  | "goose"
-  | "rooster"
-  | "snake" // original "eel"
-  | "cobra"
   | "boar"
-  | "hawk"; // original "crab"
+  | "hawk"
+  | "deer"
+  | "bear"
+  | "squirrel"
+  | "goat";
 type Card = {
   name: CardName;
   moves: [number, number][]; // [dr, dc] offsets from piece position

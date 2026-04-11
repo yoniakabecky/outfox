@@ -8,14 +8,14 @@ describe("selectCard", () => {
   const initialState = {
     phase: "select-card",
     currentTurn: "fox",
-    foxCards: [cards.tiger, cards.dragon],
+    foxCards: [cards.hawk, cards.horse],
     tanukiCards: [cards.frog, cards.monkey],
-    waitingCard: cards.hawk,
+    waitingCard: cards.bear,
     selectedCard: null,
   } as GameState;
 
   test("should update state with selected card and change phase to select-piece", () => {
-    const cardToSelect = cards.tiger;
+    const cardToSelect = cards.hawk;
     const newState = selectCard(initialState, cardToSelect);
 
     expect(newState.phase).toBe("select-piece");
@@ -32,7 +32,7 @@ describe("selectCard", () => {
 
   test("should throw error if not in select-card phase", () => {
     const state = { ...initialState, phase: "select-piece" as const };
-    const fn = () => selectCard(state, cards.tiger);
+    const fn = () => selectCard(state, cards.hawk);
     expect(fn).toThrow(GameError);
     expect(fn).toThrow(
       expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
@@ -55,7 +55,7 @@ describe("cancelSelection", () => {
   test("should reset selected card and piece, and set phase to select-card", () => {
     const state = {
       phase: "select-piece",
-      selectedCard: cards.tiger,
+      selectedCard: cards.hawk,
     } as GameState;
     const newState = cancelSelection(state);
 
@@ -82,24 +82,25 @@ describe("makeMove", () => {
       [null, null, null, null, null],
       [null, null, null, { player: "tanuki", type: "boss" }, null],
     ],
-    foxCards: [cards.tiger, cards.dragon],
+    foxCards: [cards.hawk, cards.horse],
     tanukiCards: [cards.frog, cards.monkey],
-    waitingCard: cards.hawk,
+    waitingCard: cards.bear,
     currentTurn: "fox",
     phase: "select-piece",
-    selectedCard: cards.tiger,
+    selectedCard: cards.hawk,
     winner: null,
   } as GameState;
 
   test("should apply move, cycle card, and switch phase to select-card if no winner", () => {
+    // hawk fox-mirrored from [1,1]: [2,0],[1,-1],[1,1] → [3,1],[2,0],[2,2]; use [3,1]
     const from = [1, 1] as [number, number];
-    const to = [0, 1] as [number, number];
+    const to = [3, 1] as [number, number];
 
     const newState = makeMove(state, from, to);
 
-    expect(newState.board[0][1]).toEqual({ player: "fox", type: "sibling" });
+    expect(newState.board[3][1]).toEqual({ player: "fox", type: "sibling" });
     expect(newState.board[1][1]).toBeNull();
-    expect(newState.waitingCard).toBe(cards.tiger);
+    expect(newState.waitingCard).toBe(cards.hawk);
     expect(newState.currentTurn).toBe("tanuki");
     expect(newState.phase).toBe("select-card");
   });
@@ -108,8 +109,8 @@ describe("makeMove", () => {
     const winningState = {
       ...state,
       board: [
+        [null, null, { player: "fox", type: "boss" }, null, null],
         [null, null, null, null, null],
-        [null, { player: "fox", type: "boss" }, null, null, null],
         [null, null, { player: "tanuki", type: "sibling" }, null, null],
         [null, null, null, null, null],
         [null, null, null, { player: "tanuki", type: "boss" }, null],
@@ -117,10 +118,10 @@ describe("makeMove", () => {
       currentTurn: "tanuki",
       selectedCard: cards.frog,
     } as GameState;
-    // tanuki sibling at [2,2] uses frog move [-1,-1] to capture fox boss at [1,1]
-    const newState = makeMove(winningState, [2, 2], [1, 1]);
+    // tanuki sibling at [2,2] uses frog move [-2,0] to capture fox boss at [0,2]
+    const newState = makeMove(winningState, [2, 2], [0, 2]);
 
-    expect(newState.board[1][1]).toEqual({ player: "tanuki", type: "sibling" });
+    expect(newState.board[0][2]).toEqual({ player: "tanuki", type: "sibling" });
     expect(newState.board[2][2]).toBeNull();
     expect(newState.phase).toBe("game-over");
     expect(newState.winner).toBe("tanuki");
@@ -136,9 +137,9 @@ describe("makeMove", () => {
         [null, null, null, null, null],
         [null, null, null, { player: "tanuki", type: "boss" }, null],
       ],
-      selectedCard: cards.tiger,
+      selectedCard: cards.hawk,
     } as GameState;
-    // tiger from [2,2] can reach [4,2] (tanuki nest) via fox-mirrored move [2,0]
+    // hawk fox-mirrored from [2,2]: [+2,0] → [4,2] (tanuki nest)
     const newState = makeMove(winningState, [2, 2], [4, 2]);
 
     expect(newState.board[4][2]).toEqual({ player: "fox", type: "boss" });
@@ -152,7 +153,7 @@ describe("makeMove", () => {
       ...state,
       phase: "select-card" as const,
     } as GameState;
-    const fn = () => makeMove(invalidState, [1, 1], [0, 1]);
+    const fn = () => makeMove(invalidState, [1, 1], [3, 1]);
     expect(fn).toThrow(GameError);
     expect(fn).toThrow(
       expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
@@ -161,7 +162,7 @@ describe("makeMove", () => {
 
   test("should throw error if no card is selected", () => {
     const invalidState = { ...state, selectedCard: null } as GameState;
-    const fn = () => makeMove(invalidState, [1, 1], [0, 1]);
+    const fn = () => makeMove(invalidState, [1, 1], [3, 1]);
     expect(fn).toThrow(GameError);
     expect(fn).toThrow(
       expect.objectContaining({ code: ErrorCode.NO_CARD_SELECTED }),
@@ -169,8 +170,8 @@ describe("makeMove", () => {
   });
 
   test("should throw error if move is invalid according to selected card", () => {
-    const invalidState = { ...state, selectedCard: cards.dragon } as GameState;
-    // dragon fox-mirrored moves from [1,1]: [2,3], [0,2], [0,0] — [1,0] is not reachable
+    const invalidState = { ...state, selectedCard: cards.horse } as GameState;
+    // horse fox-mirrored moves from [1,1]: [3,0],[3,2],[2,3] — [1,0] is not reachable
     const fn = () => makeMove(invalidState, [1, 1], [1, 0]);
     expect(fn).toThrow(GameError);
     expect(fn).toThrow(
@@ -222,27 +223,27 @@ describe("makeMove", () => {
         [null, { player: "tanuki", type: "sibling" }, null, { player: "tanuki", type: "boss" }, null],
       ],
       currentTurn: "tanuki" as const,
-      selectedCard: cards.frog, // tanuki frog moves: [0,-2],[−1,−1],[1,1]; from [4,1] → [3,0] valid
+      selectedCard: cards.frog, // frog tanuki moves from [4,1]: [-2,0]→[2,1], [0,-1]→[4,0], [1,1]→[5,2 OOB]
     } as GameState;
-    const newState = makeMove(tanukiState, [4, 1], [3, 0]);
+    const newState = makeMove(tanukiState, [4, 1], [2, 1]);
 
     expect(newState.currentTurn).toBe("fox");
     expect(newState.waitingCard).toBe(cards.frog);
-    expect(newState.tanukiCards).toContain(cards.hawk); // old waitingCard enters hand
+    expect(newState.tanukiCards).toContain(cards.bear); // old waitingCard enters hand
     expect(newState.tanukiCards).not.toContain(cards.frog);
     expect(newState.phase).toBe("select-card");
   });
 
   test("should place the waiting card at the same hand index as the used card", () => {
-    // Use foxCards[1] = dragon; dragon fox moves from [1,1]: [2,3],[2,-1 OOB],[0,2 own],[0,0]
+    // Use foxCards[1] = horse; horse fox-mirrored from [1,1]: [3,0],[3,2],[2,3]
     const newState = makeMove(
-      { ...state, selectedCard: cards.dragon } as GameState,
+      { ...state, selectedCard: cards.horse } as GameState,
       [1, 1],
-      [2, 3],
+      [3, 2],
     );
 
-    expect(newState.foxCards[1]).toBe(cards.hawk); // waiting card fills slot 1 (dragon's slot)
-    expect(newState.foxCards[0]).toBe(cards.tiger); // slot 0 unchanged
-    expect(newState.waitingCard).toBe(cards.dragon); // used card becomes new waiting
+    expect(newState.foxCards[1]).toBe(cards.bear); // waiting card fills slot 1 (horse's slot)
+    expect(newState.foxCards[0]).toBe(cards.hawk); // slot 0 unchanged
+    expect(newState.waitingCard).toBe(cards.horse); // used card becomes new waiting
   });
 });

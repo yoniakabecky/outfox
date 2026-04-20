@@ -89,6 +89,8 @@ describe("makeMove", () => {
     phase: "select-piece",
     selectedCard: cards.hawk,
     winner: null,
+    foxPoints: 0,
+    tanukiPoints: 0,
   } as GameState;
 
   test("should apply move, cycle card, and switch phase to select-card if no winner", () => {
@@ -105,7 +107,37 @@ describe("makeMove", () => {
     expect(newState.phase).toBe("select-card");
   });
 
-  test("should set winner and change phase to game-over if move results in win (tanuki)", () => {
+  test("should award 1 point when capturing a sibling (no game-over)", () => {
+    // hawk fox-mirrored from [1,1]: [+1,+1] → [2,2] (tanuki sibling)
+    const newState = makeMove(state, [1, 1], [2, 2]);
+
+    expect(newState.foxPoints).toBe(1);
+    expect(newState.tanukiPoints).toBe(0);
+    expect(newState.phase).toBe("select-card");
+    expect(newState.winner).toBeNull();
+  });
+
+  test("should award 3 points when capturing a boss and trigger game-over at 5", () => {
+    const winningState = {
+      ...state,
+      board: [
+        [null, null, null, null, null],
+        [null, { player: "fox", type: "sibling" }, null, null, null],
+        [null, null, { player: "tanuki", type: "boss" }, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+      ],
+      foxPoints: 2, // 2 + 3 = 5 → win
+    } as GameState;
+    // hawk fox-mirrored from [1,1]: [+1,+1] → [2,2] (tanuki boss)
+    const newState = makeMove(winningState, [1, 1], [2, 2]);
+
+    expect(newState.foxPoints).toBe(5);
+    expect(newState.phase).toBe("game-over");
+    expect(newState.winner).toBe("fox");
+  });
+
+  test("should trigger game-over for tanuki when capturing boss at 5 points", () => {
     const winningState = {
       ...state,
       board: [
@@ -117,35 +149,14 @@ describe("makeMove", () => {
       ],
       currentTurn: "tanuki",
       selectedCard: cards.frog,
+      tanukiPoints: 2, // 2 + 3 = 5 → win
     } as GameState;
     // tanuki sibling at [2,2] uses frog move [-2,0] to capture fox boss at [0,2]
     const newState = makeMove(winningState, [2, 2], [0, 2]);
 
-    expect(newState.board[0][2]).toEqual({ player: "tanuki", type: "sibling" });
-    expect(newState.board[2][2]).toBeNull();
+    expect(newState.tanukiPoints).toBe(5);
     expect(newState.phase).toBe("game-over");
     expect(newState.winner).toBe("tanuki");
-  });
-
-  test("should set winner and change phase to game-over if move results in win (fox)", () => {
-    const winningState = {
-      ...state,
-      board: [
-        [null, null, null, null, null],
-        [null, { player: "fox", type: "sibling" }, null, null, null],
-        [null, null, { player: "fox", type: "boss" }, null, null],
-        [null, null, null, null, null],
-        [null, null, null, { player: "tanuki", type: "boss" }, null],
-      ],
-      selectedCard: cards.hawk,
-    } as GameState;
-    // hawk fox-mirrored from [2,2]: [+2,0] → [4,2] (tanuki nest)
-    const newState = makeMove(winningState, [2, 2], [4, 2]);
-
-    expect(newState.board[4][2]).toEqual({ player: "fox", type: "boss" });
-    expect(newState.board[2][2]).toBeNull();
-    expect(newState.phase).toBe("game-over");
-    expect(newState.winner).toBe("fox");
   });
 
   test("should throw error if phase is not 'select-piece'", () => {
@@ -220,7 +231,13 @@ describe("makeMove", () => {
         [null, null, null, null, null],
         [null, null, null, null, null],
         [null, null, null, null, null],
-        [null, { player: "tanuki", type: "sibling" }, null, { player: "tanuki", type: "boss" }, null],
+        [
+          null,
+          { player: "tanuki", type: "sibling" },
+          null,
+          { player: "tanuki", type: "boss" },
+          null,
+        ],
       ],
       currentTurn: "tanuki" as const,
       selectedCard: cards.frog, // frog tanuki moves from [4,1]: [-2,0]→[2,1], [0,-1]→[4,0], [1,1]→[5,2 OOB]

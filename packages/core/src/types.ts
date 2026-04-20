@@ -30,6 +30,8 @@ type GameState = {
   phase: "select-card" | "select-piece" | "game-over";
   selectedCard: Card | null;
   winner: Player | null;
+  foxPoints: number;
+  tanukiPoints: number;
 };
 
 export type { Board, Card, CardName, Cell, GameState, Hand, PieceType, Player };

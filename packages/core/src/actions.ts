@@ -28,6 +28,27 @@ export const cancelSelection = (state: GameState): GameState => {
   };
 };
 
+const calcCapturePoints = (
+  state: GameState,
+  to: [number, number],
+): { foxPoints: number; tanukiPoints: number } => {
+  const [toRow, toCol] = to;
+  const targetCell = state.board[toRow][toCol];
+  if (targetCell === null || targetCell.player === state.currentTurn)
+    return { foxPoints: state.foxPoints, tanukiPoints: state.tanukiPoints };
+
+  // TODO: Add +2 points for snack cell when that mechanic is implemented.
+  const points = targetCell.type === "boss" ? 3 : 1;
+  return {
+    foxPoints:
+      state.currentTurn === "fox" ? state.foxPoints + points : state.foxPoints,
+    tanukiPoints:
+      state.currentTurn === "tanuki"
+        ? state.tanukiPoints + points
+        : state.tanukiPoints,
+  };
+};
+
 const cycleCard = (state: GameState, usedCard: Card): GameState => {
   const isFox = state.currentTurn === "fox";
   const hand = isFox ? state.foxCards : state.tanukiCards;
@@ -87,18 +108,19 @@ export const makeMove = (
     );
 
   const afterMove = applyMove(state, from, to);
-  const winner = checkWin(afterMove);
+  const stateWithPoints = { ...afterMove, ...calcCapturePoints(state, to) };
+  const winner = checkWin(stateWithPoints);
 
   if (winner) {
     return {
-      ...afterMove,
+      ...stateWithPoints,
       phase: "game-over",
       winner,
       selectedCard: null,
     };
   }
 
-  const afterCycle = cycleCard(afterMove, state.selectedCard);
+  const afterCycle = cycleCard(stateWithPoints, state.selectedCard);
   return {
     ...afterCycle,
     phase: "select-card",

@@ -14,5 +14,7 @@ export const initState = (): GameState => {
     phase: "select-card",
     selectedCard: null,
     winner: null,
+    foxPoints: 0,
+    tanukiPoints: 0,
   };
 };

@@ -9,11 +9,13 @@ describe("initState", () => {
     expect(state.tanukiCards).toHaveLength(2);
     expect(state.waitingCard).toBeDefined();
     expect(state.currentTurn).toBe(state.waitingCard.stamp);
-    expect(state.phase).toBe("select-card");
+    expect(state.phase).toBe("hide-snack");
     expect(state.selectedCard).toBeNull();
     expect(state.winner).toBeNull();
     expect(state.foxPoints).toBe(0);
     expect(state.tanukiPoints).toBe(0);
+    expect(state.foxSnack).toBeNull();
+    expect(state.tanukiSnack).toBeNull();
   });
 
   test("should set up the board with fox on row 0, tanuki on row 4, empty middle rows", () => {

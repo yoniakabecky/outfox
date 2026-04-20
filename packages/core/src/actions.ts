@@ -1,8 +1,51 @@
 import { applyMove, validatePosition } from "./board";
 import { ErrorCode, GameError } from "./errors";
 import { validateMove } from "./moves";
-import type { Card, GameState, Hand } from "./types";
+import type { Card, GameState, Hand, Player } from "./types";
 import { checkWin } from "./win";
+
+export const placeSnack = (
+  state: GameState,
+  player: Player,
+  position: [number, number],
+): GameState => {
+  if (state.phase !== "hide-snack")
+    throw new GameError(ErrorCode.WRONG_PHASE, "Not in hide-snack phase");
+
+  const [row, col] = position;
+
+  if (!validatePosition(row, col))
+    throw new GameError(ErrorCode.OUT_OF_BOUNDS, "Position is out of bounds");
+
+  const isFox = player === "fox";
+  const validRows = isFox ? [3, 4] : [0, 1];
+  if (!validRows.includes(row))
+    throw new GameError(
+      ErrorCode.INVALID_SNACK_PLACEMENT,
+      "Snack must be placed in own half of the board",
+    );
+
+  if (state.board[row][col] !== null)
+    throw new GameError(ErrorCode.INVALID_SNACK_PLACEMENT, "Cell is occupied");
+
+  if (isFox ? state.foxSnack !== null : state.tanukiSnack !== null)
+    throw new GameError(
+      ErrorCode.INVALID_SNACK_PLACEMENT,
+      "Player has already placed their snack",
+    );
+
+  const next = {
+    ...state,
+    foxSnack: isFox ? position : state.foxSnack,
+    tanukiSnack: isFox ? state.tanukiSnack : position,
+  };
+
+  if (next.foxSnack !== null && next.tanukiSnack !== null) {
+    return { ...next, phase: "select-card" };
+  }
+
+  return next;
+};
 
 export const selectCard = (state: GameState, card: Card): GameState => {
   if (state.phase !== "select-card")

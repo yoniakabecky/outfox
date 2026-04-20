@@ -27,11 +27,13 @@ type GameState = {
   tanukiCards: Hand;
   waitingCard: Card;
   currentTurn: Player;
-  phase: "select-card" | "select-piece" | "game-over";
+  phase: "hide-snack" | "select-card" | "select-piece" | "game-over";
   selectedCard: Card | null;
   winner: Player | null;
   foxPoints: number;
   tanukiPoints: number;
+  foxSnack: [number, number] | null;
+  tanukiSnack: [number, number] | null;
 };
 
 export type { Board, Card, CardName, Cell, GameState, Hand, PieceType, Player };

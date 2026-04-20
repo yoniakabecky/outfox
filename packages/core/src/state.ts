@@ -11,10 +11,12 @@ export const initState = (): GameState => {
     tanukiCards: [cards[1], cards[3]],
     waitingCard: cards[4],
     currentTurn: cards[4].stamp,
-    phase: "select-card",
+    phase: "hide-snack",
     selectedCard: null,
     winner: null,
     foxPoints: 0,
     tanukiPoints: 0,
+    foxSnack: null,
+    tanukiSnack: null,
   };
 };

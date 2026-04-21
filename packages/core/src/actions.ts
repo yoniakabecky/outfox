@@ -74,14 +74,19 @@ export const cancelSelection = (state: GameState): GameState => {
 const calcPoints = (
   state: GameState,
   to: [number, number],
-): Pick<GameState, "foxPoints" | "tanukiPoints" | "foxSnack" | "tanukiSnack"> => {
+): Pick<
+  GameState,
+  "foxPoints" | "tanukiPoints" | "foxSnack" | "tanukiSnack"
+> => {
   const [toRow, toCol] = to;
   const isFox = state.currentTurn === "fox";
 
   const targetCell = state.board[toRow][toCol];
   const capturePoints =
     targetCell && targetCell.player !== state.currentTurn
-      ? targetCell.type === "boss" ? 3 : 1
+      ? targetCell.type === "boss"
+        ? 3
+        : 1
       : 0;
 
   const opponentSnack = isFox ? state.tanukiSnack : state.foxSnack;

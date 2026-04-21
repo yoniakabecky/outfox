@@ -1,4 +1,4 @@
-export { cancelSelection, makeMove, selectCard } from "./actions";
+export { cancelSelection, makeMove, placeSnack, selectCard } from "./actions";
 export { cards } from "./cards";
 export { ErrorCode, GameError } from "./errors";
 export { getValidMoves } from "./moves";

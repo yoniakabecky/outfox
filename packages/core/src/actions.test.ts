@@ -7,9 +7,21 @@ import type { GameState } from "./types";
 describe("placeSnack", () => {
   const board: GameState["board"] = [
     [null, null, { player: "tanuki", type: "boss" }, null, null],
-    [{ player: "tanuki", type: "sibling" }, null, null, null, { player: "tanuki", type: "sibling" }],
+    [
+      { player: "tanuki", type: "sibling" },
+      null,
+      null,
+      null,
+      { player: "tanuki", type: "sibling" },
+    ],
     [null, null, null, null, null],
-    [{ player: "fox", type: "sibling" }, null, null, null, { player: "fox", type: "sibling" }],
+    [
+      { player: "fox", type: "sibling" },
+      null,
+      null,
+      null,
+      { player: "fox", type: "sibling" },
+    ],
     [null, null, { player: "fox", type: "boss" }, null, null],
   ];
 
@@ -31,33 +43,45 @@ describe("placeSnack", () => {
   test("should throw WRONG_PHASE if not in hide-snack", () => {
     const state = { ...baseState, phase: "select-card" as const };
     const fn = () => placeSnack(state, "fox", [3, 1]);
-    expect(fn).toThrow(expect.objectContaining({ code: ErrorCode.WRONG_PHASE }));
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.WRONG_PHASE }),
+    );
   });
 
   test("should throw OUT_OF_BOUNDS for invalid position", () => {
     const fn = () => placeSnack(baseState, "fox", [-1, 0]);
-    expect(fn).toThrow(expect.objectContaining({ code: ErrorCode.OUT_OF_BOUNDS }));
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.OUT_OF_BOUNDS }),
+    );
   });
 
   test("should throw INVALID_SNACK_PLACEMENT when fox places in tanuki half (rows 0-1)", () => {
     const fn = () => placeSnack(baseState, "fox", [0, 2]);
-    expect(fn).toThrow(expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }));
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }),
+    );
   });
 
   test("should throw INVALID_SNACK_PLACEMENT when tanuki places in fox half (rows 3-4)", () => {
     const fn = () => placeSnack(baseState, "tanuki", [4, 2]);
-    expect(fn).toThrow(expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }));
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }),
+    );
   });
 
   test("should throw INVALID_SNACK_PLACEMENT when cell is occupied", () => {
     const fn = () => placeSnack(baseState, "fox", [3, 0]); // fox sibling is there
-    expect(fn).toThrow(expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }));
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }),
+    );
   });
 
   test("should throw INVALID_SNACK_PLACEMENT if player already placed", () => {
     const state = { ...baseState, foxSnack: [3, 1] as [number, number] };
     const fn = () => placeSnack(state, "fox", [3, 2]);
-    expect(fn).toThrow(expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }));
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.INVALID_SNACK_PLACEMENT }),
+    );
   });
 
   test("should set foxSnack and stay in hide-snack when only fox has placed", () => {

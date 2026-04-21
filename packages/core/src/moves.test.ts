@@ -112,7 +112,13 @@ describe("getValidMoves", () => {
   test("should return empty array if all moves are invalid", () => {
     const state = {
       board: [
-        [{ player: "fox" }, null, { player: "fox", type: "boss" }, null, { player: "fox" }],
+        [
+          { player: "fox" },
+          null,
+          { player: "fox", type: "boss" },
+          null,
+          { player: "fox" },
+        ],
         [null, null, null, null, null],
         [null, null, null, null, null],
         [null, null, null, null, null],

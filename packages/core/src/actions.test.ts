@@ -352,3 +352,78 @@ describe("makeMove", () => {
     expect(newState.waitingCard).toBe(cards.horse); // used card becomes new waiting
   });
 });
+
+describe("makeMove — snack scoring", () => {
+  // Board: fox sibling at [1,1], tanuki sibling at [2,2], all else empty
+  // Fox uses hawk; hawk fox moves from [1,1]: [+1,+1]→[2,2], [+1,-1]→[2,0], [+2,0]→[3,1]
+  const snackState: GameState = {
+    board: [
+      [null, null, null, null, null],
+      [null, { player: "fox", type: "sibling" }, null, null, null],
+      [null, null, { player: "tanuki", type: "sibling" }, null, null],
+      [null, null, null, null, null],
+      [null, null, null, null, null],
+    ],
+    foxCards: [cards.hawk, cards.horse],
+    tanukiCards: [cards.frog, cards.monkey],
+    waitingCard: cards.bear,
+    currentTurn: "fox",
+    phase: "select-piece",
+    selectedCard: cards.hawk,
+    winner: null,
+    foxPoints: 0,
+    tanukiPoints: 0,
+    foxSnack: [3, 3],
+    tanukiSnack: [1, 3],
+  };
+
+  test("fox moves to empty tanuki snack cell — +2 pts, tanukiSnack cleared", () => {
+    // move fox sibling [1,1] → [3,1] (empty); set tanukiSnack at [3,1]
+    const s = { ...snackState, tanukiSnack: [3, 1] as [number, number] };
+    const next = makeMove(s, [1, 1], [3, 1]);
+    expect(next.foxPoints).toBe(2);
+    expect(next.tanukiSnack).toBeNull();
+  });
+
+  test("fox moves to tanuki piece on tanuki snack cell — capture (+1) + snack (+2) = +3 pts", () => {
+    // move fox sibling [1,1] → [2,2] (tanuki sibling); set tanukiSnack at [2,2]
+    const s = { ...snackState, tanukiSnack: [2, 2] as [number, number] };
+    const next = makeMove(s, [1, 1], [2, 2]);
+    expect(next.foxPoints).toBe(3);
+    expect(next.tanukiSnack).toBeNull();
+  });
+
+  test("tanuki moves to fox snack cell — +2 pts for tanuki, foxSnack cleared", () => {
+    // tanuki sibling at [2,2] uses frog; frog tanuki moves: [-2,0]→[0,2], [0,-1]→[2,1], [1,1]→[3,3]
+    const s: GameState = {
+      ...snackState,
+      board: [
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+        [null, null, { player: "tanuki", type: "sibling" }, null, null],
+        [null, null, null, null, null],
+        [null, null, null, null, null],
+      ],
+      currentTurn: "tanuki",
+      selectedCard: cards.frog,
+      foxSnack: [0, 2] as [number, number], // tanuki moves to fox's snack
+    };
+    const next = makeMove(s, [2, 2], [0, 2]);
+    expect(next.tanukiPoints).toBe(2);
+    expect(next.foxSnack).toBeNull();
+  });
+
+  test("moving to own snack cell — no bonus", () => {
+    // fox moves to its own foxSnack — no points awarded
+    const s = { ...snackState, foxSnack: [3, 1] as [number, number] };
+    const next = makeMove(s, [1, 1], [3, 1]);
+    expect(next.foxPoints).toBe(0);
+    expect(next.foxSnack).toEqual([3, 1]); // unchanged
+  });
+
+  test("snack already found (null) — no bonus when moving to that cell again", () => {
+    const s = { ...snackState, tanukiSnack: null };
+    const next = makeMove(s, [1, 1], [3, 1]);
+    expect(next.foxPoints).toBe(0);
+  });
+});

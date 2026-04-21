@@ -71,24 +71,32 @@ export const cancelSelection = (state: GameState): GameState => {
   };
 };
 
-const calcCapturePoints = (
+const calcPoints = (
   state: GameState,
   to: [number, number],
-): { foxPoints: number; tanukiPoints: number } => {
+): Pick<GameState, "foxPoints" | "tanukiPoints" | "foxSnack" | "tanukiSnack"> => {
   const [toRow, toCol] = to;
-  const targetCell = state.board[toRow][toCol];
-  if (targetCell === null || targetCell.player === state.currentTurn)
-    return { foxPoints: state.foxPoints, tanukiPoints: state.tanukiPoints };
+  const isFox = state.currentTurn === "fox";
 
-  // TODO: Add +2 points for snack cell when that mechanic is implemented.
-  const points = targetCell.type === "boss" ? 3 : 1;
+  const targetCell = state.board[toRow][toCol];
+  const capturePoints =
+    targetCell && targetCell.player !== state.currentTurn
+      ? targetCell.type === "boss" ? 3 : 1
+      : 0;
+
+  const opponentSnack = isFox ? state.tanukiSnack : state.foxSnack;
+  const snackFound =
+    opponentSnack != null &&
+    opponentSnack[0] === toRow &&
+    opponentSnack[1] === toCol;
+
+  const total = capturePoints + (snackFound ? 2 : 0);
+
   return {
-    foxPoints:
-      state.currentTurn === "fox" ? state.foxPoints + points : state.foxPoints,
-    tanukiPoints:
-      state.currentTurn === "tanuki"
-        ? state.tanukiPoints + points
-        : state.tanukiPoints,
+    foxPoints: isFox ? state.foxPoints + total : state.foxPoints,
+    tanukiPoints: isFox ? state.tanukiPoints : state.tanukiPoints + total,
+    foxSnack: !isFox && snackFound ? null : state.foxSnack,
+    tanukiSnack: isFox && snackFound ? null : state.tanukiSnack,
   };
 };
 
@@ -151,7 +159,7 @@ export const makeMove = (
     );
 
   const afterMove = applyMove(state, from, to);
-  const stateWithPoints = { ...afterMove, ...calcCapturePoints(state, to) };
+  const stateWithPoints = { ...afterMove, ...calcPoints(state, to) };
   const winner = checkWin(stateWithPoints);
 
   if (winner) {

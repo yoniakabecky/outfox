@@ -14,9 +14,11 @@ type CardName =
   | "bear"
   | "squirrel"
   | "goat";
+type Position = [number, number];
+
 type Card = {
   name: CardName;
-  moves: [number, number][]; // [dr, dc] offsets from piece position
+  moves: Position[]; // [dr, dc] offsets from piece position
   stamp: Player; // which player goes first if this is the 5th card
 };
 type Hand = [Card, Card]; // each player has exactly 2 cards
@@ -32,8 +34,8 @@ type GameState = {
   winner: Player | null;
   foxPoints: number;
   tanukiPoints: number;
-  foxSnack: [number, number] | null;
-  tanukiSnack: [number, number] | null;
+  foxSnack: Position | null;
+  tanukiSnack: Position | null;
 };
 
-export type { Board, Card, CardName, Cell, GameState, Hand, PieceType, Player };
+export type { Board, Card, CardName, Cell, GameState, Hand, PieceType, Player, Position };

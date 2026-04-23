@@ -297,7 +297,7 @@ export function useMarkets() {
 ```typescript
 // PASS: useMemo for expensive computations
 const sortedMarkets = useMemo(() => {
-  return markets.sort((a, b) => b.volume - a.volume)
+  return [...markets].sort((a, b) => b.volume - a.volume)
 }, [markets])
 
 // PASS: useCallback for functions passed to children

@@ -18,15 +18,12 @@ export const placeSnack = (
     throw new GameError(ErrorCode.OUT_OF_BOUNDS, "Position is out of bounds");
 
   const isFox = player === "fox";
-  const validRows = isFox ? [3, 4] : [0, 1];
+  const validRows = isFox ? [0, 1] : [3, 4];
   if (!validRows.includes(row))
     throw new GameError(
       ErrorCode.INVALID_SNACK_PLACEMENT,
       "Snack must be placed in own half of the board",
     );
-
-  if (state.board[row][col] !== null)
-    throw new GameError(ErrorCode.INVALID_SNACK_PLACEMENT, "Cell is occupied");
 
   if (isFox ? state.foxSnack !== null : state.tanukiSnack !== null)
     throw new GameError(

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import type { GameState } from "./types";
 import { checkWin } from "./win";
+import { ErrorCode, GameError } from "./errors";
 
 describe("checkWin", () => {
   const baseState = { foxPoints: 0, tanukiPoints: 0 } as GameState;
@@ -31,6 +32,14 @@ describe("checkWin", () => {
     // Boss capture (+3) can push a player from 3 to 6
     expect(checkWin({ ...baseState, foxPoints: 6, tanukiPoints: 3 })).toBe(
       "fox",
+    );
+  });
+
+  test("should throw an error when both players reach 5 points simultaneously", () => {
+    const fn = () => checkWin({ ...baseState, foxPoints: 5, tanukiPoints: 5 });
+    expect(fn).toThrow(GameError);
+    expect(fn).toThrow(
+      expect.objectContaining({ code: ErrorCode.INVALID_GAME_STATE }),
     );
   });
 });
